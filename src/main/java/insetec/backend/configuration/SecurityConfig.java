@@ -31,14 +31,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/announcements").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/announcements").hasRole("SELLER")
                         .requestMatchers(HttpMethod.GET, "/announcements/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/announcements/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/announcements/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/announcements/**").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.PUT, "/announcements/**").hasRole("SELLER")
 
                         .requestMatchers(HttpMethod.GET, "/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/users/current").hasRole("USER")
                         .anyRequest().authenticated()
                 )

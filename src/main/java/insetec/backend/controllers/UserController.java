@@ -62,12 +62,8 @@ public class UserController {
     @GetMapping("/current")
     @Secured("ROLE_USER")
     public ResponseEntity<User> getCurrentUser() {
-        System.out.println("Received request for getCurrentUser");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
-
-        System.out.println("Login: " + login);
 
         Optional<User> optionalUser = repository.getByLogin(login);
         return optionalUser.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
