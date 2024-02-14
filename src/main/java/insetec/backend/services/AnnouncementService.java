@@ -1,4 +1,4 @@
 package insetec.backend.services;
 
-public class AnnouncementServices {
+public class AnnouncementService {
 }
