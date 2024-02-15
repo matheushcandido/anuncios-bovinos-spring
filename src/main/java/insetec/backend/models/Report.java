@@ -33,6 +33,6 @@ public class Report {
 
     private String note;
 
-    private Status active = Status.ACTIVE;
+    private Status status = Status.ACTIVE;
 
 }

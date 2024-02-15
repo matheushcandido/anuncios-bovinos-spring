@@ -40,6 +40,20 @@ public class ReportController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Report> close(@PathVariable String id, @RequestBody Report closedReport) {
+        Optional<Report> optionalReport = repository.findById(id);
+        if (optionalReport.isPresent()) {
+            Report existingReport = optionalReport.get();
+            existingReport.setStatus(closedReport.getStatus());
+
+            Report savedReport = repository.save(existingReport);
+            return new ResponseEntity<>(savedReport, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         Optional<Report> optionalReport = repository.findById(id);
