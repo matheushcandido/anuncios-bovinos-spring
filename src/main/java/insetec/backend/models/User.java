@@ -1,6 +1,7 @@
 package insetec.backend.models;
 
 import insetec.backend.enums.UserRole;
+import insetec.backend.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,10 +32,13 @@ public class User implements UserDetails {
 
     private UserRole role;
 
-    public User(String login, String password, UserRole role){
+    private UserStatus status = UserStatus.ACTIVE;
+
+    public User(String login, String password, UserRole role, String name){
         this.login = login;
         this.password = password;
         this.role = role;
+        this.name = name;
     }
 
     @Override

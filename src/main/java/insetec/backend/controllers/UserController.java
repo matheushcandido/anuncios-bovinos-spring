@@ -69,4 +69,18 @@ public class UserController {
         return optionalUser.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+    @PutMapping("/block/{id}")
+    public ResponseEntity<User> blockUser(@PathVariable String id, @RequestBody User updatedUser) {
+        Optional<User> optionalUser = repository.findById(id);
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+            existingUser.setStatus(updatedUser.getStatus());
+
+            User savedUser = repository.save(existingUser);
+            return new ResponseEntity<>(savedUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
