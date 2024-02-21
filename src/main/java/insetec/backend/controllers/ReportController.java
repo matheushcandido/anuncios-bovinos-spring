@@ -1,14 +1,11 @@
 package insetec.backend.controllers;
 
-import insetec.backend.models.Announcement;
+import insetec.backend.enums.Status;
 import insetec.backend.models.Report;
-import insetec.backend.repositories.AnnouncementRepository;
 import insetec.backend.repositories.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,11 +38,11 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Report> close(@PathVariable String id, @RequestBody Report closedReport) {
+    public ResponseEntity<Report> close(@PathVariable String id) {
         Optional<Report> optionalReport = repository.findById(id);
         if (optionalReport.isPresent()) {
             Report existingReport = optionalReport.get();
-            existingReport.setStatus(closedReport.getStatus());
+            existingReport.setStatus(Status.INACTIVE);
 
             Report savedReport = repository.save(existingReport);
             return new ResponseEntity<>(savedReport, HttpStatus.OK);

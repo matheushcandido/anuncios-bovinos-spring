@@ -1,5 +1,6 @@
 package insetec.backend.controllers;
 
+import insetec.backend.enums.UserStatus;
 import insetec.backend.models.Announcement;
 import insetec.backend.models.User;
 import insetec.backend.repositories.UserRepository;
@@ -71,11 +72,25 @@ public class UserController {
     }
 
     @PutMapping("/block/{id}")
-    public ResponseEntity<User> blockUser(@PathVariable String id, @RequestBody User updatedUser) {
+    public ResponseEntity<User> blockUser(@PathVariable String id) {
         Optional<User> optionalUser = repository.findById(id);
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
-            existingUser.setStatus(updatedUser.getStatus());
+            existingUser.setStatus(UserStatus.BLOCKED);
+
+            User savedUser = repository.save(existingUser);
+            return new ResponseEntity<>(savedUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/unlock/{id}")
+    public ResponseEntity<User> unlockUser(@PathVariable String id) {
+        Optional<User> optionalUser = repository.findById(id);
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+            existingUser.setStatus(UserStatus.ACTIVE);
 
             User savedUser = repository.save(existingUser);
             return new ResponseEntity<>(savedUser, HttpStatus.OK);
