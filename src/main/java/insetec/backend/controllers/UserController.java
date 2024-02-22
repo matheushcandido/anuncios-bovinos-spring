@@ -1,7 +1,6 @@
 package insetec.backend.controllers;
 
 import insetec.backend.enums.UserStatus;
-import insetec.backend.models.Announcement;
 import insetec.backend.models.User;
 import insetec.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +21,17 @@ public class UserController {
 
     @Autowired
     UserRepository repository;
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        if(this.repository.findByLogin(user.getLogin()) != null) return ResponseEntity.badRequest().build();
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(encryptedPassword);
+
+        User savedUser = repository.save(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
