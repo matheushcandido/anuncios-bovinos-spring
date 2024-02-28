@@ -52,6 +52,7 @@ public class UserController {
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
             existingUser.setName(updatedUser.getName());
+            existingUser.setStatus(updatedUser.getStatus());
 
             User savedUser = repository.save(existingUser);
             return new ResponseEntity<>(savedUser, HttpStatus.OK);

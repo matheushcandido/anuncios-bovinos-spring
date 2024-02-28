@@ -1,5 +1,6 @@
 package insetec.backend.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import insetec.backend.enums.UserRole;
 import insetec.backend.enums.UserStatus;
 import jakarta.persistence.*;
@@ -32,7 +33,7 @@ public class User implements UserDetails {
 
     private UserRole role;
 
-    private UserStatus status = UserStatus.ACTIVE;
+    private UserStatus status;
 
     public User(String login, String password, UserRole role, String name){
         this.login = login;
