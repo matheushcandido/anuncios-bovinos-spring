@@ -1,6 +1,7 @@
 package insetec.backend.controllers;
 
 import insetec.backend.enums.UserStatus;
+import insetec.backend.models.Address;
 import insetec.backend.models.User;
 import insetec.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,32 @@ public class UserController {
             User existingUser = optionalUser.get();
             existingUser.setName(updatedUser.getName());
             existingUser.setStatus(updatedUser.getStatus());
+
+            if (existingUser.getAddress() != null) {
+                // Se o usuário já tiver um endereço, atualize-o
+                Address existingAddress = existingUser.getAddress();
+                Address updatedAddress = updatedUser.getAddress();
+                existingAddress.setZip(updatedAddress.getZip());
+                existingAddress.setStreet(updatedAddress.getStreet());
+                existingAddress.setNeighborhood(updatedAddress.getNeighborhood());
+                existingAddress.setNumber(updatedAddress.getNumber());
+                existingAddress.setCity(updatedAddress.getCity());
+                existingAddress.setState(updatedAddress.getState());
+            } else {
+                // Se o usuário não tiver um endereço, crie um novo endereço
+                Address updatedAddress = updatedUser.getAddress();
+                if (updatedAddress != null) {
+                    Address newAddress = new Address();
+                    newAddress.setZip(updatedAddress.getZip());
+                    newAddress.setStreet(updatedAddress.getStreet());
+                    newAddress.setNeighborhood(updatedAddress.getNeighborhood());
+                    newAddress.setNumber(updatedAddress.getNumber());
+                    newAddress.setCity(updatedAddress.getCity());
+                    newAddress.setState(updatedAddress.getState());
+                    newAddress.setUser(existingUser);
+                    existingUser.setAddress(newAddress);
+                }
+            }
 
             User savedUser = repository.save(existingUser);
             return new ResponseEntity<>(savedUser, HttpStatus.OK);

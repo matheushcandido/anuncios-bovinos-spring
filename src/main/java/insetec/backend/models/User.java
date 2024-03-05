@@ -1,6 +1,7 @@
 package insetec.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import insetec.backend.enums.UserRole;
 import insetec.backend.enums.UserStatus;
@@ -35,6 +36,10 @@ public class User implements UserDetails {
     private UserRole role;
 
     private UserStatus status;
+
+    @JsonIgnoreProperties("user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private Address address;
 
     public User(String login, String password, UserRole role, String name){
         this.login = login;

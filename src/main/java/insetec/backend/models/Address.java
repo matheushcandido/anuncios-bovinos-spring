@@ -23,5 +23,7 @@ public class Address {
 
     private String state;
 
-    private String idUser;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
