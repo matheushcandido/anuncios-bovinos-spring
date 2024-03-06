@@ -3,10 +3,13 @@ package insetec.backend.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Entity
 @Table(name = "adresses")
 @Data
-public class Address {
+public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -26,4 +29,12 @@ public class Address {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(id, address.id);
+    }
 }

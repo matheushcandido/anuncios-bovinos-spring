@@ -1,6 +1,7 @@
 package insetec.backend.controllers;
 
 import insetec.backend.models.Announcement;
+import insetec.backend.models.User;
 import insetec.backend.repositories.AnnouncementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,9 @@ public class AnnouncementController {
     @PostMapping
     public ResponseEntity<Announcement> createAnnouncement(@RequestBody Announcement announcement) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
+        User currentUser = (User) authentication.getPrincipal();
 
-        announcement.setIdOwner(userId);
+        announcement.setUser(currentUser);
 
         Announcement savedAnnouncement = announcementRepository.save(announcement);
         return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);

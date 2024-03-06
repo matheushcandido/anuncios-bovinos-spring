@@ -56,7 +56,6 @@ public class UserController {
             existingUser.setStatus(updatedUser.getStatus());
 
             if (existingUser.getAddress() != null) {
-                // Se o usuário já tiver um endereço, atualize-o
                 Address existingAddress = existingUser.getAddress();
                 Address updatedAddress = updatedUser.getAddress();
                 existingAddress.setZip(updatedAddress.getZip());
@@ -66,7 +65,6 @@ public class UserController {
                 existingAddress.setCity(updatedAddress.getCity());
                 existingAddress.setState(updatedAddress.getState());
             } else {
-                // Se o usuário não tiver um endereço, crie um novo endereço
                 Address updatedAddress = updatedUser.getAddress();
                 if (updatedAddress != null) {
                     Address newAddress = new Address();
