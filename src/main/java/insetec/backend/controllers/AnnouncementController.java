@@ -8,14 +8,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/announcements")
 public class AnnouncementController {
+
+    private static final String UPLOAD_DIR = "src/main/resources/";
 
     @Autowired
     private AnnouncementRepository announcementRepository;
@@ -68,5 +76,4 @@ public class AnnouncementController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }

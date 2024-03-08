@@ -35,6 +35,8 @@ public class Announcement {
 
     private String note;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
 }
