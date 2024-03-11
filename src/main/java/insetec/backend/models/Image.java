@@ -9,8 +9,11 @@ import lombok.Data;
 public class Image {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String type;
+
+    @OneToOne
+    @JoinColumn(name = "announcement_id")
+    private Announcement announcement;
 }
