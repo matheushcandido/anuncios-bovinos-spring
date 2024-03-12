@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +35,8 @@ public class AnnouncementController {
     @Autowired
     private ImageRepository imageRepository;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Announcement> createAnnouncement(@RequestPart("announcement") Announcement announcement, @RequestPart("imageFile") MultipartFile imageFile) {
+    @PostMapping
+    public ResponseEntity<Announcement> createAnnouncement(@RequestBody Announcement announcement) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
 
@@ -43,31 +44,35 @@ public class AnnouncementController {
 
         Announcement savedAnnouncement = announcementRepository.save(announcement);
 
-        String imageId = UUID.randomUUID().toString();
-        String fileExtension = StringUtils.getFilenameExtension(imageId);
-
-        Path uploadDir = Paths.get("src/main/resources/announcementsImages");
-        try {
-            Files.createDirectories(uploadDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Files.copy(imageFile.getInputStream(), uploadDir.resolve(imageId), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Image image = new Image();
-        image.setId(imageId);
-        image.setType(fileExtension);
-        image.setAnnouncement(savedAnnouncement);
-        savedAnnouncement.getImages().add(image);
-
-        imageRepository.save(image);
-
         return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("announcementId") String announcementId) {
+        try {
+            Announcement announcement = announcementRepository.findById(announcementId)
+                    .orElseThrow(() -> new RuntimeException("Announcement not found"));
+
+            File directory = new File("src/main/resources/announcementsImages");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            String fileName = UUID.randomUUID().toString();
+            Path filePath = Paths.get(directory.getAbsolutePath(), fileName);
+            Files.write(filePath, file.getBytes());
+
+            Image image = new Image();
+            image.setId(fileName);
+            image.setType(file.getContentType());
+            image.setAnnouncement(announcement);
+            imageRepository.save(image);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Image uploaded successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+        }
     }
 
     @GetMapping

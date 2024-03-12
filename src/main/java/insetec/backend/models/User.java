@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +42,10 @@ public class User implements UserDetails {
     @JsonIgnoreProperties("user")
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private Address address;
+
+    @JsonIgnoreProperties("user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Announcement> announcements = new ArrayList<>();
 
     public User(String login, String password, UserRole role, String name){
         this.login = login;
