@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/announcements").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.POST, "/announcements/upload").hasRole("SELLER")
                         .requestMatchers(HttpMethod.GET, "/announcements/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/announcements/**").hasRole("SELLER")
                         .requestMatchers(HttpMethod.PUT, "/announcements/**").hasRole("SELLER")

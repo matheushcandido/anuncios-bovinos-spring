@@ -48,31 +48,26 @@ public class AnnouncementController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("announcementId") String announcementId) {
-        try {
-            Announcement announcement = announcementRepository.findById(announcementId)
-                    .orElseThrow(() -> new RuntimeException("Announcement not found"));
+    public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("announcementId") String announcementId) throws IOException {
+        Announcement announcement = announcementRepository.findById(announcementId)
+                .orElseThrow(() -> new RuntimeException("Announcement not found"));
 
-            File directory = new File("src/main/resources/announcementsImages");
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            String fileName = UUID.randomUUID().toString();
-            Path filePath = Paths.get(directory.getAbsolutePath(), fileName);
-            Files.write(filePath, file.getBytes());
-
-            Image image = new Image();
-            image.setId(fileName);
-            image.setType(file.getContentType());
-            image.setAnnouncement(announcement);
-            imageRepository.save(image);
-
-            return ResponseEntity.status(HttpStatus.OK).body("Image uploaded successfully");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+        File directory = new File("src/main/resources/announcementsImages");
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
+
+        String fileName = UUID.randomUUID().toString();
+        Path filePath = Paths.get(directory.getAbsolutePath(), fileName);
+        Files.write(filePath, file.getBytes());
+
+        Image image = new Image();
+        image.setId(fileName);
+        image.setType(file.getContentType());
+        image.setAnnouncement(announcement);
+        imageRepository.save(image);
+
+        return new ResponseEntity<>(image, HttpStatus.CREATED);
     }
 
     @GetMapping
