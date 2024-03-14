@@ -2,6 +2,7 @@ package insetec.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import insetec.backend.enums.UserRole;
 import insetec.backend.enums.UserStatus;
@@ -23,6 +24,7 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements UserDetails {
 
     @Id

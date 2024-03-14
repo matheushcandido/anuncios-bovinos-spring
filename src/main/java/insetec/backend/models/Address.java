@@ -1,5 +1,6 @@
 package insetec.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "adresses")
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

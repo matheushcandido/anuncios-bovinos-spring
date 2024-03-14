@@ -5,6 +5,7 @@ import insetec.backend.models.Image;
 import insetec.backend.models.User;
 import insetec.backend.repositories.AnnouncementRepository;
 import insetec.backend.repositories.ImageRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,12 +53,15 @@ public class AnnouncementController {
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new RuntimeException("Announcement not found"));
 
-        File directory = new File("src/main/resources/announcementsImages");
+        File directory = new File("./uploads");
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        String fileName = UUID.randomUUID().toString();
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        String fileName = UUID.randomUUID().toString() + "." + extension;
+
         Path filePath = Paths.get(directory.getAbsolutePath(), fileName);
         Files.write(filePath, file.getBytes());
 

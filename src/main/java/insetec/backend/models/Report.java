@@ -1,5 +1,6 @@
 package insetec.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import insetec.backend.enums.Status;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.Data;
 @Entity
 @Table(name = "reports")
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report {
 
     @Id

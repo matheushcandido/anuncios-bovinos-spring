@@ -1,6 +1,8 @@
 package insetec.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "announcements")
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Announcement {
 
     @Id
@@ -42,6 +45,7 @@ public class Announcement {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
+    @JsonIgnoreProperties("announcement")
     @OneToMany(mappedBy = "announcement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
