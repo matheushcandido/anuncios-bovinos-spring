@@ -53,7 +53,7 @@ public class AnnouncementController {
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new RuntimeException("Announcement not found"));
 
-        File directory = new File("./uploads");
+        File directory = new File("./frontend/uploads");
         if (!directory.exists()) {
             directory.mkdirs();
         }
