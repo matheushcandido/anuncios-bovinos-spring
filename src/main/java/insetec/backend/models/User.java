@@ -49,6 +49,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Announcement> announcements = new ArrayList<>();
 
+    @JsonIgnoreProperties("user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private Contact contact;
+
     public User(String login, String password, UserRole role, String name){
         this.login = login;
         this.password = password;

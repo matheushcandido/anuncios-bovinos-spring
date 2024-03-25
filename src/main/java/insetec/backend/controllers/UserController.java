@@ -2,6 +2,7 @@ package insetec.backend.controllers;
 
 import insetec.backend.enums.UserStatus;
 import insetec.backend.models.Address;
+import insetec.backend.models.Contact;
 import insetec.backend.models.User;
 import insetec.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,22 @@ public class UserController {
                     newAddress.setState(updatedAddress.getState());
                     newAddress.setUser(existingUser);
                     existingUser.setAddress(newAddress);
+                }
+            }
+
+            if (existingUser.getContact() != null) {
+                Contact existingContact = existingUser.getContact();
+                Contact updatedContact = updatedUser.getContact();
+                existingContact.setPhoneNumber(updatedContact.getPhoneNumber());
+                existingContact.setVerified(false);
+            } else {
+                Contact updatedContact = updatedUser.getContact();
+                if (updatedContact != null) {
+                    Contact newContact = new Contact();
+                    newContact.setPhoneNumber(updatedContact.getPhoneNumber());
+                    newContact.setVerified(false);
+                    newContact.setUser(existingUser);
+                    existingUser.setContact(newContact);
                 }
             }
 
