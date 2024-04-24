@@ -50,6 +50,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.PUT, "/users/block/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/unlock/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/sms/send").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

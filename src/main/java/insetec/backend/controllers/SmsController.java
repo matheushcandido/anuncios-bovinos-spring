@@ -24,7 +24,7 @@ public class SmsController {
 
         smsRepository.save(sms);
 
-        String messageBody = "Seu código de verificação: " + sms;
+        String messageBody = "Seu código de verificação: " + sms.getCode();
         smsService.sendSms(sms.getPhoneNumber(), messageBody);
     }
 }
