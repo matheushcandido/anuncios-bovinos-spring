@@ -8,6 +8,7 @@ import insetec.backend.repositories.SmsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +34,10 @@ public class SmsController {
     }
 
     @PostMapping("/validate")
-    public boolean validateSms(@RequestParam String userId, @RequestParam String code) {
+    public boolean validateSms(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
+        String code = requestBody.get("code");
+
         Sms sms = smsRepository.findByUserId(userId);
         Optional<User> userOptional = userRepository.findById(userId);
 

@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface SmsRepository extends JpaRepository<Sms, String> {
 
-    @Query("SELECT * FROM verification-codes WHERE user_id = :userId")
+    @Query("SELECT sms FROM Sms sms WHERE sms.userId = :userId")
     Sms findByUserId(@Param("userId") String userId);
 
 }
