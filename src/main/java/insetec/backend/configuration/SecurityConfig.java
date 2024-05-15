@@ -31,6 +31,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/index.html").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/announcements").hasRole("SELLER")
                         .requestMatchers(HttpMethod.POST, "/announcements/upload").hasRole("SELLER")
                         .requestMatchers(HttpMethod.GET, "/announcements/**").permitAll()
