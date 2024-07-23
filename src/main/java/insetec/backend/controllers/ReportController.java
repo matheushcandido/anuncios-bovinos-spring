@@ -1,8 +1,7 @@
 package insetec.backend.controllers;
 
-import insetec.backend.enums.Status;
 import insetec.backend.models.Report;
-import insetec.backend.repositories.ReportRepository;
+import insetec.backend.services.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,50 +15,48 @@ import java.util.Optional;
 public class ReportController {
 
     @Autowired
-    private ReportRepository repository;
+    private ReportService reportService;
 
     @PostMapping
     public ResponseEntity<Report> create(@RequestBody Report report) {
-        Report savedReport = repository.save(report);
-        return new ResponseEntity<>(savedReport, HttpStatus.CREATED);
+        try {
+            Report savedReport = reportService.createReport(report);
+            return new ResponseEntity<>(savedReport, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<Report>> getAll() {
-        List<Report> reports = repository.findAll();
-        return new ResponseEntity<>(reports, HttpStatus.OK);
+        try {
+            List<Report> reports = reportService.getAllReports();
+            return new ResponseEntity<>(reports, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Report> getById(@PathVariable String id) {
-        Optional<Report> optionalReport = repository.findById(id);
+        Optional<Report> optionalReport = reportService.getReportById(id);
         return optionalReport.map(report -> new ResponseEntity<>(report, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Report> close(@PathVariable String id) {
-        Optional<Report> optionalReport = repository.findById(id);
-        if (optionalReport.isPresent()) {
-            Report existingReport = optionalReport.get();
-            existingReport.setStatus(Status.INACTIVE);
-
-            Report savedReport = repository.save(existingReport);
-            return new ResponseEntity<>(savedReport, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<Report> optionalReport = reportService.closeReport(id);
+        return optionalReport.map(report -> new ResponseEntity<>(report, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        Optional<Report> optionalReport = repository.findById(id);
-        if (optionalReport.isPresent()) {
-            repository.deleteById(id);
+        if (reportService.deleteReport(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }

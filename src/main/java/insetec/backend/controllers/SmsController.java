@@ -1,15 +1,11 @@
 package insetec.backend.controllers;
 
-import insetec.backend.models.User;
-import insetec.backend.repositories.UserRepository;
-import insetec.backend.services.SmsService;
 import insetec.backend.models.Sms;
-import insetec.backend.repositories.SmsRepository;
+import insetec.backend.services.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/sms")
@@ -18,41 +14,24 @@ public class SmsController {
     @Autowired
     private SmsService smsService;
 
-    @Autowired
-    private SmsRepository smsRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
     @PostMapping("/send")
-    public void sendSms(@RequestBody Sms sms) {
-
-        smsRepository.save(sms);
-
-        String messageBody = "Seu código de verificação: " + sms.getCode();
-        smsService.sendSms(sms.getPhoneNumber(), messageBody);
+    public void sendSms(@RequestBody Sms sms) throws Exception {
+        try {
+            smsService.sendSms(sms);
+        } catch (Exception e) {
+            throw new Exception("Erro ao enviar SMS.", e);
+        }
     }
 
     @PostMapping("/validate")
-    public boolean validateSms(@RequestBody Map<String, String> requestBody) {
-        String userId = requestBody.get("userId");
-        String code = requestBody.get("code");
+    public boolean validateSms(@RequestBody Map<String, String> requestBody) throws Exception {
+        try {
+            String userId = requestBody.get("userId");
+            String code = requestBody.get("code");
 
-        Sms sms = smsRepository.findByUserId(userId);
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (sms != null && userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            if (sms.getCode().equals(code)) {
-                user.getContact().setVerified(true);
-                userRepository.save(user);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+            return smsService.validateSms(userId, code);
+        } catch (Exception e) {
+            throw new Exception("Erro ao validar SMS.", e);
         }
     }
 }

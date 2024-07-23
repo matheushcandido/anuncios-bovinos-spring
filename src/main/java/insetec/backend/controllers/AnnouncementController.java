@@ -2,112 +2,77 @@ package insetec.backend.controllers;
 
 import insetec.backend.models.Announcement;
 import insetec.backend.models.Image;
-import insetec.backend.models.User;
-import insetec.backend.repositories.AnnouncementRepository;
-import insetec.backend.repositories.ImageRepository;
-import org.apache.commons.io.FilenameUtils;
+import insetec.backend.services.AnnouncementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/announcements")
 public class AnnouncementController {
 
     @Autowired
-    private AnnouncementRepository announcementRepository;
-
-    @Autowired
-    private ImageRepository imageRepository;
+    private AnnouncementService announcementService;
 
     @PostMapping
-    public ResponseEntity<Announcement> createAnnouncement(@RequestBody Announcement announcement) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-
-        announcement.setUser(currentUser);
-
-        Announcement savedAnnouncement = announcementRepository.save(announcement);
-
-        return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+    public ResponseEntity<Announcement> createAnnouncement(@RequestBody Announcement announcement) throws Exception {
+        try {
+            Announcement savedAnnouncement = announcementService.createAnnouncement(announcement);
+            return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+        } catch (Exception e) {
+            throw new Exception("Erro ao criar anúncio.", e);
+        }
     }
 
     @PostMapping("/upload")
     public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("announcementId") String announcementId) throws IOException {
-        Announcement announcement = announcementRepository.findById(announcementId)
-                .orElseThrow(() -> new RuntimeException("Announcement not found"));
-
-        File directory = new File("./frontend/src/assets/uploads");
-        if (!directory.exists()) {
-            directory.mkdirs();
+        try {
+            Image image = announcementService.uploadImage(file, announcementId);
+            return new ResponseEntity<>(image, HttpStatus.CREATED);
+        } catch (IOException e) {
+            throw new IOException("Erro ao enviar imagem.", e);
         }
-
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-
-        String fileName = UUID.randomUUID().toString() + "." + extension;
-
-        Path filePath = Paths.get(directory.getAbsolutePath(), fileName);
-        Files.write(filePath, file.getBytes());
-
-        Image image = new Image();
-        image.setId(fileName);
-        image.setType(file.getContentType());
-        image.setAnnouncement(announcement);
-        imageRepository.save(image);
-
-        return new ResponseEntity<>(image, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<Announcement>> getAllAnnouncements() {
-        List<Announcement> announcements = announcementRepository.findAll();
-        return new ResponseEntity<>(announcements, HttpStatus.OK);
+        try {
+            List<Announcement> announcements = announcementService.getAllAnnouncements();
+            return new ResponseEntity<>(announcements, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable String id) {
-        Optional<Announcement> optionalAnnouncement = announcementRepository.findById(id);
+        Optional<Announcement> optionalAnnouncement = announcementService.getAnnouncementById(id);
         return optionalAnnouncement.map(announcement -> new ResponseEntity<>(announcement, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Announcement> updateAnnouncement(@PathVariable String id, @RequestBody Announcement updatedAnnouncement) {
-        Optional<Announcement> optionalAnnouncement = announcementRepository.findById(id);
-        if (optionalAnnouncement.isPresent()) {
-            Announcement existingAnnouncement = optionalAnnouncement.get();
-            existingAnnouncement.setName(updatedAnnouncement.getName());
-
-            Announcement savedAnnouncement = announcementRepository.save(existingAnnouncement);
+        try {
+            Announcement savedAnnouncement = announcementService.updateAnnouncement(id, updatedAnnouncement);
             return new ResponseEntity<>(savedAnnouncement, HttpStatus.OK);
-        } else {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnnouncement(@PathVariable String id) {
-        Optional<Announcement> optionalAnnouncement = announcementRepository.findById(id);
-        if (optionalAnnouncement.isPresent()) {
-            announcementRepository.deleteById(id);
+        try {
+            announcementService.deleteAnnouncement(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

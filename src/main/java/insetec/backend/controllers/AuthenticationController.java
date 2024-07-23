@@ -3,16 +3,10 @@ package insetec.backend.controllers;
 import insetec.backend.DTOs.AuthenticationDTO;
 import insetec.backend.DTOs.LoginResponseDTO;
 import insetec.backend.DTOs.RegisterDTO;
-import insetec.backend.models.User;
-import insetec.backend.repositories.UserRepository;
-import insetec.backend.services.TokenService;
+import insetec.backend.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,35 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private TokenService tokenService;
+    private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
-
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseDTO(token));
-
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+        LoginResponseDTO response = authenticationService.login(data);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
-        if(this.repository.findByLogin(data.login()) != null) return ResponseEntity.badRequest().build();
-
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data.login(), encryptedPassword, data.role(), data.name());
-
-        this.repository.save(newUser);
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data){
+        try {
+            authenticationService.register(data);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
